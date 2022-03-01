@@ -74,6 +74,11 @@ COPY --chmod=755 files/autopause /autopause
 COPY --chmod=755 files/autostop /autostop
 
 RUN dos2unix /start* /autopause/* /autostop/*
+RUN apt-get update && apt-get install -y openssh-server
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
+ENTRYPOINT service ssh start && bash
+RUN useradd -m -s /bin/bash sshuser
+RUN echo "sshuser:Incur2006MC" | changepasswd
 ENTRYPOINT [ "/start" ]
 HEALTHCHECK --start-period=1m CMD mc-health
